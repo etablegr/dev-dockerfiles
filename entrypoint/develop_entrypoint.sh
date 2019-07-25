@@ -37,11 +37,8 @@ if [ ! -z "${XDEBUG_IDE_KEY}" ]; then
     echo "xdebug.idekey=\"${XDEBUG_IDE_KEY}\"" >> ${XDEBUG_CONF_FILE}
 fi
 
-echo "Fixing execution permissions"
-find /var/www/html -iname "*.php" | xargs chmod 777
-
-# echo "Running Composer"
-
+# echo "Fixing execution permissions"
+# find /var/www/html -iname "*.php" | xargs chmod 777
 
 echo "Launch application"
 exec "$@"

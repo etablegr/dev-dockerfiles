@@ -5,9 +5,7 @@ LABEL maintainer="Desyllas Dimitrios <d.desyllas@e-table.gr> <pcmagas@disroot.or
 
 ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     PHP_SETTINGS="$PHP_INI_DIR/php.ini"\
-    FPM_CONF_DIR="/usr/local/etc/php-fpm.d" \
-    SESSION_STORAGE_TYPE="memcache"\
-    SESSION_STORAGE_PATH="tcp:\/\/memcache:11211"
+    FPM_CONF_DIR="/usr/local/etc/php-fpm.d"
 
 RUN apk add --update libzip-dev libmcrypt-dev libpng-dev libjpeg-turbo-dev libxml2-dev icu-dev postgresql-dev curl-dev libmemcached-dev &&\
     apk add --update --virtual build-dependencies build-base gcc wget autoconf &&\    
@@ -41,7 +39,6 @@ RUN mv "$PHP_INI_DIR/php.ini-production" ${PHP_SETTINGS} &&\
     sed -i "s/allow_url_include = .*/allow_url_include = On/" ${PHP_SETTINGS} &&\
     sed -i "s/expose_php = .*/expose_php = Off/" ${PHP_SETTINGS} &&\
     sed -i "s/;date.timezone =/date.timezone = \"Europe\/Athens\"/" ${PHP_SETTINGS} &&\
-    sed -i "s/session.save_handler = .*/session.save_handler = ${SESSION_STORAGE_TYPE}/" ${PHP_SETTINGS} &&\
-    sed -i "s/;session.save_path = .*/session.save_path = \"${SESSION_STORAGE_PATH}\"/" ${PHP_SETTINGS}
+    sed -i "s/memory_limit = .*/memory_limit = 512M /" ${PHP_SETTINGS}
 
 CMD ["php", "-r", "exit();"]

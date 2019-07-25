@@ -1,4 +1,4 @@
-FROM ddesyllas/php-dev:base
+FROM etable/php-dev:base
 
 LABEL "com.example.vendor"="etable.gr"
 LABEL maintainer="Desyllas Dimitrios <d.desyllas@e-table.gr> <pcmagas@disroot.org>"
@@ -15,14 +15,9 @@ ENV DOCKER_UID=1000 \
 RUN echo "Installing Development Dpendencies \n" &&\
     echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories &&\
     apk add --update --virtual build-dependencies build-base gcc wget autoconf &&\
-    apk add --update bash shadow git bash-completion bash-doc &&\
-    echo "Installing composer \n" &&\
-    php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" &&\
-    php -r "if (hash_file('sha384', '/tmp/composer-setup.php') === '48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" &&\
-    php /tmp/composer-setup.php --install-dir=/bin --filename=composer &&\
-    rm -rf /tmp/cpmposer-setup.php &&\
-    chmod +x /bin/composer &&\
-    echo "Installing xdebug" &&\
+    apk add --update bash shadow git bash-completion bash-doc
+
+RUN echo "Installing xdebug" &&\
     pecl install xdebug  &&\
     docker-php-ext-enable xdebug &&\
     echo "Configuring Xdebug \n" &&\
@@ -30,9 +25,13 @@ RUN echo "Installing Development Dpendencies \n" &&\
     echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.remote_mode=req" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.remote_log=xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
-    cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig &&\
-    apk del build-dependencies &&\
-    rm -rf /var/cache/apk/*
+    cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig 
+
+RUN echo "Installing composer \n" &&\
+    php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" &&\
+    php /tmp/composer-setup.php --install-dir=/bin --filename=composer &&\
+    rm -rf /tmp/cpmposer-setup.php &&\
+    chmod +x /bin/composer
 
 # I make seperate layer because Entrypoint is most likely to change
 COPY ./entrypoint/develop_entrypoint.sh /usr/local/bin/entrypoint.sh
